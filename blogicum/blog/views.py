@@ -5,32 +5,31 @@ from django.http import Http404
 from .models import Post, Category
 
 
-def index(request):
-    template_name = 'blog/index.html'
-    post_list = Post.objects.select_related(
-        'category', 'author', 'location').filter(
+def filter_posts(posts):
+    return posts.filter(
         Q(pub_date__lte=now())
         & Q(is_published=True)
-        & Q(category__is_published=True))[0:5]
+        & Q(category__is_published=True)
+    )
+
+
+def index(request):
+    template_name = 'blog/index.html'
+    post_list = filter_posts(
+        Post.objects.select_related('category', 'author', 'location')
+    )[0:5]
     context = {'post_list': post_list}
     return render(request, template_name, context)
 
 
 def post_detail(request, post_id):
     template_name = 'blog/detail.html'
-    try:
-        post = Post.objects.select_related(
-            'category', 'author', 'location').get(pk=post_id)
-    except Post.DoesNotExist:
-        raise Http404
-
-    if (
-        post.pub_date > now()
-        or post.is_published is False
-        or post.category.is_published is False
-    ):
-        raise Http404
-
+    post = get_object_or_404(
+        filter_posts(
+            Post.objects.select_related('category', 'author', 'location')
+        ),
+        pk=post_id
+    )
     context = {
         'post': post
     }
@@ -39,13 +38,13 @@ def post_detail(request, post_id):
 
 def category_posts(request, category_slug):
     template_name = 'blog/category.html'
-    category = get_object_or_404(Category, slug=category_slug)
-    if not category.is_published:
-        raise Http404
-
-    post_list = category.posts.select_related(
-        'category', 'author', 'location').filter(
-        Q(pub_date__lte=now()) & Q(is_published=True))
+    category = get_object_or_404(
+        Category.objects.filter(is_published=True),
+        slug=category_slug
+    )
+    post_list = filter_posts(
+        category.posts.select_related('category', 'author', 'location')
+    )
     context = {
         'category': category,
         'post_list': post_list
