@@ -9,8 +9,8 @@ def index(request):
     template_name = 'blog/index.html'
     post_list = Post.objects.select_related(
         'category', 'author', 'location').filter(
-        Q(pub_date__lte=now()) 
-        & Q(is_published=True) 
+        Q(pub_date__lte=now())
+        & Q(is_published=True)
         & Q(category__is_published=True))[0:5]
     context = {'post_list': post_list}
     return render(request, template_name, context)
