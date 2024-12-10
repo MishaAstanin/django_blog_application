@@ -9,9 +9,9 @@ def index(request):
     template_name = 'blog/index.html'
     post_list = Post.objects.select_related(
         'category', 'author', 'location').filter(
-        Q(pub_date__lte=now()) &
-        Q(is_published=True) &
-        Q(category__is_published=True))[0:5]
+        Q(pub_date__lte=now()) 
+        & Q(is_published=True) 
+        & Q(category__is_published=True))[0:5]
     context = {'post_list': post_list}
     return render(request, template_name, context)
 
@@ -26,8 +26,8 @@ def post_detail(request, post_id):
 
     if (
         post.pub_date > now()
-        or post.is_published == False
-        or post.category.is_published == False
+        or post.is_published is False
+        or post.category.is_published is False
     ):
         raise Http404
 
