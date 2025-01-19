@@ -8,13 +8,17 @@
 
 1. Склонируйте репозиторий
 2. Активируйте виртуальное окружение и установите зависимости
+   
     `python -m venv venv`
+   
     `source venv/bin/activate` на Linux/macOS
+   
     `venv\Scripts\activate`  на Windows
+   
     `pip install -r requirements.txt`
-3. Создайте и примените миграции:
+4. Создайте и примените миграции:
     `python manage.py migrate`
-4. Запустите сервер разработки
+5. Запустите сервер разработки
     `python manage.py runserver`
 
 ## Вклад в проект
